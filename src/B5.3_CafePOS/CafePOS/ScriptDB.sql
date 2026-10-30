@@ -1,0 +1,53 @@
+IF DB_ID('CafePOSDB') IS NOT NULL DROP DATABASE CafePOSDB;
+GO
+CREATE DATABASE CafePOSDB;
+GO
+USE CafePOSDB;
+GO
+
+CREATE TABLE BanAn (
+    MaBan INT IDENTITY(1,1) PRIMARY KEY,
+    TenBan NVARCHAR(50) NOT NULL,
+    TrangThai NVARCHAR(20) NOT NULL DEFAULT N'Trống'
+);
+
+CREATE TABLE DanhMuc (
+    MaDanhMuc INT IDENTITY(1,1) PRIMARY KEY,
+    TenDanhMuc NVARCHAR(100) NOT NULL
+);
+
+CREATE TABLE MonAn (
+    MaMon INT IDENTITY(1,1) PRIMARY KEY,
+    TenMon NVARCHAR(100) NOT NULL,
+    MaDanhMuc INT NOT NULL FOREIGN KEY REFERENCES DanhMuc(MaDanhMuc),
+    DonGia DECIMAL(18,2) NOT NULL CHECK (DonGia >= 0)
+);
+
+CREATE TABLE HoaDon (
+    MaHoaDon INT IDENTITY(1,1) PRIMARY KEY,
+    MaBan INT NOT NULL FOREIGN KEY REFERENCES BanAn(MaBan),
+    GioVao DATETIME NOT NULL DEFAULT GETDATE(),
+    GioRa DATETIME NULL,
+    TongTien DECIMAL(18,2) NOT NULL DEFAULT 0,
+    TrangThai BIT NOT NULL DEFAULT 0
+);
+
+CREATE TABLE ChiTietHoaDon (
+    MaChiTiet INT IDENTITY(1,1) PRIMARY KEY,
+    MaHoaDon INT NOT NULL FOREIGN KEY REFERENCES HoaDon(MaHoaDon),
+    MaMon INT NOT NULL FOREIGN KEY REFERENCES MonAn(MaMon),
+    SoLuong INT NOT NULL CHECK (SoLuong > 0),
+    DonGia DECIMAL(18,2) NOT NULL
+);
+
+INSERT INTO BanAn (TenBan) VALUES
+(N'Bàn 01'),(N'Bàn 02'),(N'Bàn 03'),(N'Bàn 04'),
+(N'Bàn 05'),(N'Bàn 06'),(N'Bàn 07'),(N'Bàn 08');
+
+INSERT INTO DanhMuc (TenDanhMuc) VALUES (N'Cà phê'),(N'Trà sữa'),(N'Đồ ăn nhẹ');
+
+INSERT INTO MonAn (TenMon, MaDanhMuc, DonGia) VALUES
+(N'Cà phê đen', 1, 20000),(N'Cà phê sữa', 1, 25000),(N'Bạc xỉu', 1, 30000),
+(N'Trà sữa trân châu', 2, 35000),(N'Trà sữa matcha', 2, 40000),
+(N'Bánh mì', 3, 15000),(N'Bánh flan', 3, 12000);
+GO
